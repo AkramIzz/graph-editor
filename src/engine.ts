@@ -1,5 +1,8 @@
 import { GraphEventsStream } from "./event";
 import { GraphSystem } from "./systems/system";
+import { GraphVisualSystem } from "./systems/visual/visual";
+import { GraphCodeEditorSystem } from "./systems/code/code";
+import { GraphDSLSystem } from "./systems/dsl/dsl";
 
 export class GraphEngine {
   static readonly instance = new GraphEngine();
@@ -8,6 +11,10 @@ export class GraphEngine {
   graph = new GraphEventsStream();
 
   constructor(options: { selfStart: boolean } = { selfStart: false }) {
+    this.systems.set(GraphVisualSystem.name, new GraphVisualSystem(this, this.graph));
+    this.systems.set(GraphCodeEditorSystem.name, new GraphCodeEditorSystem(this, this.graph));
+    this.systems.set(GraphDSLSystem.name, new GraphDSLSystem(this, this.graph));
+
     this.init();
 
     if (options.selfStart) {
