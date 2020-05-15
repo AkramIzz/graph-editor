@@ -1,0 +1,23 @@
+{
+  "name": "graph-editor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "browserify src/ -p [ tsify --noImplicitAny ] --standalone graphy -o lib/build/bundle.js --debug",
+    "watch": "watchify src/ -p [ tsify --noImplicitAny ] --standalone graphy -o lib/build/bundle.js -v --debug",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tsify": "^4.0.1",
+    "typescript": "^3.8.3"
+  },
+  "dependencies": {
+    "@types/ace": "0.0.43",
+    "ace": "^1.3.0",
+    "konva": "^5.0.3"
+  }
+}
