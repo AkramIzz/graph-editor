@@ -115,13 +115,20 @@ export class SceneManager extends GraphSystem {
 abstract class Entity {
   key: string | undefined;
 
-  public _shape: konva.Shape;
-
-  constructor(shape: konva.Shape) {
-    this._shape = shape;
+  public get graphic(): konva.Shape { return this._shape.children[0] as konva.Shape; }
+  public set graphic(shape: konva.Shape) {
+    this._shape.removeChildren();
+    this._shape.add(shape);
   }
 
-  public get position() { return this._shape.position() };
+  public _shape: konva.Group;
+
+  constructor(graphic: konva.Shape) {
+    this._shape = new konva.Group();
+    this._shape.add(graphic);
+  }
+
+  public get position() { return this.graphic.position() };
   public get events() {
     return { on: this._shape.on.bind(this._shape), off: this._shape.off.bind(this._shape) };
   }
@@ -132,20 +139,17 @@ export class NodeEntity extends Entity {
     super(NodeEntity.createNode(x, y));
 
     let system = GraphEngine.instance.systems.get(GraphVisualSystem.name)! as GraphVisualSystem
-    this.events.on('dragend', () => {
-      // defining events on shape means that when a shape is removed
-      // the events are removed too. In this case this is not desired.
-      // Find a workaround.
-      console.log('dragging');
+    this.events.on('dragmove', () => {
       if (this.key === undefined) return;
-      system.graph.getEdgesOfNode(system.graph.getNodeByKey(this.key)!).forEach((edge) => {
+      let edges = system.graph.getEdgesOfNode(system.graph.getNodeByKey(this.key)!)
+      edges.forEach((edge) => {
         let edgeEntity = system.edges.get(edge.key)!
-        edgeEntity._shape.remove();
-        edgeEntity._shape = EdgeEntity.createEdge(
+
+        edgeEntity.graphic = EdgeEntity.createEdge(
           system.nodes.get(edge.firstNode.key)!,
           system.nodes.get(edge.secondNode.key)!
         );
-        system._layer.add(edgeEntity._shape);
+
         system.markNeedsDrawing();
       });
     });
