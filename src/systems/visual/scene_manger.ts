@@ -154,7 +154,7 @@ export class NodeEntity extends Entity {
   static createNode(x: number, y: number): konva.Circle {
     let node = new konva.Circle({
       x: x, y: y,
-      radius: 25,
+      radius: 10,
       fill: 'white',
       stroke: 'black',
       strokeWidth: 2,
@@ -174,7 +174,7 @@ export class EdgeEntity extends Entity {
     let edge = new konva.Line({
       fill: 'white',
       stroke: 'black',
-      strokeWidth: 4,
+      strokeWidth: 2,
       points: [
         from.position.x, from.position.y,
         to.position.x, to.position.y,
