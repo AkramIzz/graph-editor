@@ -1,18 +1,36 @@
 import { GraphSystem } from "../system";
 import { GraphEventType } from "../../event";
-
+import CodeMirror from "codemirror";
 
 export class GraphCodeEditorSystem extends GraphSystem {
-    public editor = ace.edit("editor");
+  public editor: CodeMirror.Editor = (window as any).editor;
 
-    init() {
-        this.editor.setTheme("ace/theme/twilight");
-        this.editor.session.setMode("ace/mode/python");
+  private _shouldReplayOnEvents = false;
+  private get shouldReplayOnEvents() { return this._shouldReplayOnEvents };
+  private set shouldReplayOnEvents(value: boolean) {
+    if (value == true) {
+      document.getElementById("replayButton")!.style.color = "#909090";
+    } else {
+      document.getElementById("replayButton")!.style.color = "#000000 ";
     }
+    this._shouldReplayOnEvents = value;
+  }
 
-    update() {
-        this.editor.resize();
+  init() {
+    document.getElementById("evalButton")!.onclick = () => {
+      eval(this.editor.getValue());
+    };
+
+    document.getElementById("replayButton")!.onclick = () => {
+      this.shouldReplayOnEvents = !this.shouldReplayOnEvents;
     }
+  }
 
-    onEvent(type: GraphEventType, key: string): void { }
+  update() { }
+
+  onEvent(type: GraphEventType, key: string): void {
+    if (this.shouldReplayOnEvents) {
+      eval(this.editor.getValue());
+    }
+  }
 }
