@@ -5,6 +5,9 @@ import { GraphEngine } from '../../engine';
 import { GraphVisualSystem } from './visual';
 
 export class SceneManager extends GraphSystem {
+  Node = NodeEntity;
+  Edge = EdgeEntity;
+
   nodes = new Map<string, NodeEntity>();
   edges = new Map<string, EdgeEntity>();
 
