@@ -135,8 +135,23 @@ abstract class Entity {
 }
 
 export class NodeEntity extends Entity {
-  constructor(x: number, y: number) {
-    super(NodeEntity.createNode(x, y));
+  private _color: string;
+
+  get color(): string {
+    return this._color;
+  }
+
+  set color(color: string) {
+    let system = GraphEngine.instance.systems.get(GraphVisualSystem.name)! as GraphVisualSystem
+    this.graphic.fill(color);
+    system.markNeedsDrawing();
+
+    this._color = color;
+  }
+
+  constructor(x: number, y: number, color: string = "white") {
+    super(NodeEntity.createNode(x, y, color));
+    this._color = color;
 
     let system = GraphEngine.instance.systems.get(GraphVisualSystem.name)! as GraphVisualSystem
     this.events.on('dragmove', () => {
@@ -147,7 +162,8 @@ export class NodeEntity extends Entity {
 
         edgeEntity.graphic = EdgeEntity.createEdge(
           system.nodes.get(edge.firstNode.key)!,
-          system.nodes.get(edge.secondNode.key)!
+          system.nodes.get(edge.secondNode.key)!,
+          edgeEntity.color
         );
 
         system.markNeedsDrawing();
@@ -155,11 +171,11 @@ export class NodeEntity extends Entity {
     });
   }
 
-  static createNode(x: number, y: number): konva.Circle {
+  static createNode(x: number, y: number, color: string): konva.Circle {
     let node = new konva.Circle({
       x: x, y: y,
       radius: 10,
-      fill: 'white',
+      fill: color,
       stroke: 'black',
       strokeWidth: 2,
       draggable: true,
@@ -170,14 +186,29 @@ export class NodeEntity extends Entity {
 }
 
 export class EdgeEntity extends Entity {
-  constructor(public from: NodeEntity, public to: NodeEntity) {
-    super(EdgeEntity.createEdge(from, to));
+  private _color: string;
+
+  get color(): string {
+    return this._color;
   }
 
-  static createEdge(from: NodeEntity, to: NodeEntity): konva.Line {
+  set color(color: string) {
+    let system = GraphEngine.instance.systems.get(GraphVisualSystem.name)! as GraphVisualSystem
+    this.graphic.stroke(color);
+    system.markNeedsDrawing();
+
+    this._color = color;
+  }
+
+  constructor(public from: NodeEntity, public to: NodeEntity, color: string = "black") {
+    super(EdgeEntity.createEdge(from, to, color));
+    this._color = color;
+  }
+
+  static createEdge(from: NodeEntity, to: NodeEntity, color: string): konva.Line {
     let edge = new konva.Line({
       fill: 'white',
-      stroke: 'black',
+      stroke: color,
       strokeWidth: 2,
       points: [
         from.position.x, from.position.y,
