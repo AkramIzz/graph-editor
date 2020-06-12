@@ -1,7 +1,7 @@
 import konva from 'konva';
 import { GraphSystem } from '../system';
 import { Mode, NodeMode, EdgeMode } from './mode';
-import { Scene } from './scene_manger';
+import { Scene } from './scene';
 import { GraphEventType } from '../../event';
 
 export class GraphVisualSystem extends GraphSystem {
