@@ -48,5 +48,15 @@ export class GraphVisualSystem extends GraphSystem {
 
   onEvent(type: GraphEventType, key: string): void {
     this.scene.onEvent(type, key);
+
+    switch (type) {
+      case GraphEventType.edgeAdded:
+      case GraphEventType.nodeAdded:
+        // TODO this is just a workaround
+        // I think it may be better to pass on the new node or edge for configuration
+        this.currentMode.end(this);
+        this.currentMode.begin(this);
+        break;
+    }
   }
 }
