@@ -1,13 +1,17 @@
 import konva from 'konva';
+import { GraphSystem } from '../system';
 import { Mode, NodeMode, EdgeMode } from './mode';
-import { SceneManager } from './scene_manger';
+import { Scene } from './scene_manger';
+import { GraphEventType } from '../../event';
 
-export class GraphVisualSystem extends SceneManager {
+export class GraphVisualSystem extends GraphSystem {
   stage = new konva.Stage({
     container: 'stage',
     width: window.innerWidth / 3,
     height: window.innerHeight * 0.8,
   });
+
+  scene = new Scene(this.graph);
 
   private currentMode: Mode = new NodeMode();
 
@@ -26,7 +30,7 @@ export class GraphVisualSystem extends SceneManager {
   init() {
     this.currentMode.begin(this);
 
-    this.stage.add(this._layer);
+    this.stage.add(this.scene._layer);
 
     window.addEventListener('keypress', (ev) => {
       if (ev.key == 'm') {
@@ -35,10 +39,14 @@ export class GraphVisualSystem extends SceneManager {
       }
     });
 
-    this.markNeedsDrawing();
+    this.scene.markNeedsDrawing();
   }
 
   update() {
-    super.update();
+    this.scene.update();
+  }
+
+  onEvent(type: GraphEventType, key: string): void {
+    this.scene.onEvent(type, key);
   }
 }
