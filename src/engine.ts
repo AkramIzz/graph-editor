@@ -11,10 +11,6 @@ export class GraphEngine {
   graph = new GraphEventsStream();
 
   constructor(options: { selfStart: boolean } = { selfStart: false }) {
-    this.systems.set(GraphVisualSystem.name, new GraphVisualSystem(this, this.graph));
-    this.systems.set(GraphCodeEditorSystem.name, new GraphCodeEditorSystem(this, this.graph));
-    this.systems.set(GraphHistorySystem.name, new GraphHistorySystem(this, this.graph));
-
     this.init();
 
     if (options.selfStart) {
@@ -23,19 +19,45 @@ export class GraphEngine {
   }
 
   private init(): void {
+    this.systems.set(GraphVisualSystem.name, new GraphVisualSystem(this, this.graph));
+    this.systems.set(GraphCodeEditorSystem.name, new GraphCodeEditorSystem(this, this.graph));
+    this.systems.set(GraphHistorySystem.name, new GraphHistorySystem(this, this.graph));
     this.systems.forEach((system) => {
       system.init();
     });
+
+    this.systems.forEach((system) => {
+      system.start();
+    });
   }
+
+  private animationFrame: number | undefined;
 
   run() {
     this.update();
-    requestAnimationFrame(this.run.bind(this));
+    this.animationFrame = requestAnimationFrame(this.run.bind(this));
   }
 
   update() {
     this.systems.forEach(system => {
       system.update();
     });
+  }
+
+  restart() {
+    let shouldRerun = false;
+    if (this.animationFrame !== undefined) {
+      cancelAnimationFrame(this.animationFrame);
+      shouldRerun = true;
+    }
+
+    this.graph = new GraphEventsStream();
+    this.systems.forEach((system) => {
+      system.restart(this.graph);
+    });
+
+    if (shouldRerun) {
+      this.run();
+    }
   }
 }

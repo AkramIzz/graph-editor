@@ -11,12 +11,12 @@ export class GraphVisualSystem extends GraphSystem {
     height: window.innerHeight * 0.8,
   });
 
-  scene = new Scene(this.graph);
+  scene!: Scene;
 
-  private currentMode: Mode = new NodeMode();
+  private currentMode: Mode | undefined;
 
   changeMode() {
-    this.currentMode.end(this);
+    this.currentMode?.end(this);
 
     if (this.currentMode instanceof NodeMode) {
       this.currentMode = new EdgeMode();
@@ -24,22 +24,32 @@ export class GraphVisualSystem extends GraphSystem {
       this.currentMode = new NodeMode();
     }
 
-    this.currentMode.begin(this);
+    this.currentMode?.begin(this);
   }
 
   init() {
-    this.currentMode.begin(this);
-
-    this.stage.add(this.scene._layer);
-
     window.addEventListener('keypress', (ev) => {
       if (ev.key == 'm') {
         console.log('changing mode');
         this.changeMode();
       }
     });
+  }
 
+  start() {
+    this.scene = new Scene(this.graph);
+    this.currentMode = this.currentMode ?? new NodeMode();
+
+    this.stage.add(this.scene._layer);
     this.scene.markNeedsDrawing();
+
+    this.currentMode.begin(this);
+  }
+
+  stop() {
+    this.currentMode?.end(this);
+    this.stage.removeChildren();
+    this.scene._layer.destroy();
   }
 
   update() {
@@ -54,8 +64,8 @@ export class GraphVisualSystem extends GraphSystem {
       case GraphEventType.nodeAdded:
         // TODO this is just a workaround
         // I think it may be better to pass on the new node or edge for configuration
-        this.currentMode.end(this);
-        this.currentMode.begin(this);
+        this.currentMode?.end(this);
+        this.currentMode?.begin(this);
         break;
     }
   }

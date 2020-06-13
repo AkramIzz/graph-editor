@@ -3,7 +3,7 @@ import { Graph, GraphNode, GraphEdge } from '../graph';
 import { GraphEngine } from '../engine';
 
 export abstract class GraphSystem {
-  readonly graph: GraphEventsSharedDispatchListener
+  graph: GraphEventsSharedDispatchListener;
 
   constructor(
     public readonly engine: GraphEngine,
@@ -14,9 +14,19 @@ export abstract class GraphSystem {
 
   abstract init(): void;
 
+  start(): void { }
+
+  stop(): void { }
+
   abstract update(): void;
 
   abstract onEvent(type: GraphEventType, key: string): void;
+
+  restart(graph: GraphEventsStream) {
+    this.stop();
+    this.graph = new GraphEventsSharedDispatchListener(this, graph);
+    this.start();
+  }
 }
 
 class GraphEventsSharedDispatchListener implements Graph {
