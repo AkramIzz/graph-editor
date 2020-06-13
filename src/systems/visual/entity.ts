@@ -18,7 +18,11 @@ abstract class Entity {
     this._shape.add(graphic);
   }
 
-  public get position() { return this.graphic.position() };
+  public get position() { return this.graphic.position(); }
+  public set position(vec: {x: number, y: number}) {
+    this.graphic.position(vec);
+  }
+  
   public get events() {
     return { on: this._shape.on.bind(this._shape), off: this._shape.off.bind(this._shape) };
   }
