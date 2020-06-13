@@ -95,6 +95,7 @@ export class Scene {
         let secondNode = this.nodes.get(edge.secondNode.key)!;
 
         let edgeEntity = new EdgeEntity(firstNode, secondNode);
+        edgeEntity.key = key;
         this.edges.set(key, edgeEntity);
         this._layer.add(edgeEntity._shape);
 
