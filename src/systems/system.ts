@@ -29,6 +29,22 @@ export abstract class GraphSystem {
   }
 }
 
+export abstract class GraphSystemWithHooks<HookType> extends GraphSystem {
+  readonly hooks: Array<HookType>;
+
+  constructor(
+    engine: GraphEngine,
+    graph: GraphEventsStream,
+  ) {
+    super(engine, graph);
+    this.hooks = [];
+  }
+
+  registerHook(hook: HookType) {
+    this.hooks.push(hook);
+  }
+}
+
 class GraphEventsSharedDispatchListener implements Graph {
   nodes: Map<string, GraphNode>;
   edges: Map<string, GraphEdge>;
