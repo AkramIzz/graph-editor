@@ -1,13 +1,26 @@
 import { GraphNode, GraphEdge, Graph } from "./graph";
 
-export enum GraphEventType { nodeAdded, nodeRemoved, edgeRemoved, edgeAdded }
+export enum GraphEventType {
+  nodeAdded,
+  nodeRemoved,
+  edgeRemoved,
+  edgeAdded
+}
 
-export type GraphEventListener = (type: GraphEventType, key: string, emitter: GraphEventSource) => void;
+export type GraphEventListener = (
+  type: GraphEventType,
+  key: string,
+  emitter: GraphEventSource
+) => void;
 
 export interface GraphEventSource {
   addNode(value?: any): GraphNode;
 
-  addEdge(_firstNode: GraphNode, _secondNode: GraphNode, value?: any): GraphEdge;
+  addEdge(
+    _firstNode: GraphNode,
+    _secondNode: GraphNode,
+    value?: any
+  ): GraphEdge;
 
   removeEdge(_edge: GraphEdge): boolean;
 
@@ -17,10 +30,14 @@ export interface GraphEventSource {
 export class GraphEventsStream extends Graph implements GraphEventSource {
   private listeners = new Set<GraphEventListener>();
 
-  private pushEvent(type: GraphEventType, key: string, emitter: GraphEventSource) {
+  private pushEvent(
+    type: GraphEventType,
+    key: string,
+    emitter: GraphEventSource
+  ) {
     console.log(`pushing event: ${type}, key: ${key}, emitter: ${emitter}`);
     this.listeners.forEach(listener => {
-      listener(type, key, emitter)
+      listener(type, key, emitter);
     });
   }
 
@@ -34,13 +51,18 @@ export class GraphEventsStream extends Graph implements GraphEventSource {
     return node;
   }
 
-  addEdge(_firstNode: GraphNode, _secondNode: GraphNode, value?: any, emitter?: GraphEventSource) {
+  addEdge(
+    _firstNode: GraphNode,
+    _secondNode: GraphNode,
+    value?: any,
+    emitter?: GraphEventSource
+  ) {
     let edge = super.addEdge(_firstNode, _secondNode, value);
     this.pushEvent(GraphEventType.edgeAdded, edge.key, emitter || this);
     return edge;
   }
 
-  removeEdge(_edge: GraphEdge, emitter?: GraphEventSource) {    
+  removeEdge(_edge: GraphEdge, emitter?: GraphEventSource) {
     if (super.removeEdge(_edge)) {
       this.pushEvent(GraphEventType.edgeRemoved, _edge.key, emitter || this);
       return true;
