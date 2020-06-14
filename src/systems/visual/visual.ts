@@ -1,10 +1,10 @@
-import konva from 'konva';
-import { Mode, NodeMode, EdgeMode } from './mode';
-import { SceneManager } from './scene_manger';
+import konva from "konva";
+import { Mode, NodeMode, EdgeMode } from "./mode";
+import { SceneManager } from "./scene_manger";
 
 export class GraphVisualSystem extends SceneManager {
   stage = new konva.Stage({
-    container: 'stage',
+    container: "stage",
     width: window.innerWidth / 3,
     height: window.innerHeight * 0.8,
   });
@@ -28,9 +28,9 @@ export class GraphVisualSystem extends SceneManager {
 
     this.stage.add(this._layer);
 
-    window.addEventListener('keypress', (ev) => {
-      if (ev.key == 'm') {
-        console.log('changing mode');
+    window.addEventListener("keypress", (ev) => {
+      if (ev.key == "m") {
+        console.log("changing mode");
         this.changeMode();
       }
     });
