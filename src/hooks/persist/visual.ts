@@ -1,14 +1,16 @@
-import { GraphPersistenceHook } from "../../systems/persist/hook"
+import { GraphPersistenceHook } from "../../systems/persist/hook";
 import { GraphVisualSystem } from "../../systems/visual/visual";
-import { GraphEngine } from '../../engine';
+import { GraphEngine } from "../../engine";
 
 export class VisualSystemPersistenceHook extends GraphPersistenceHook {
   get system(): GraphVisualSystem {
-    return GraphEngine.instance.systems.get(GraphVisualSystem.name)! as GraphVisualSystem;
+    return GraphEngine.instance.systems.get(
+      GraphVisualSystem.name
+    )! as GraphVisualSystem;
   }
 
   get name(): string {
-    return 'VisualSystem';
+    return "VisualSystem";
   }
 
   serializeSystem(): any | undefined {
@@ -20,13 +22,13 @@ export class VisualSystemPersistenceHook extends GraphPersistenceHook {
     return {
       x: entity.position.x,
       y: entity.position.y,
-      color: entity.color,
+      color: entity.color
     };
   }
 
   serializeEdge(key: string): any | undefined {
     let entity = this.system.scene.edges.get(key)!;
-    return { color: entity.color }
+    return { color: entity.color };
   }
 
   deserializeSystem(data: any | undefined): void {
@@ -36,7 +38,11 @@ export class VisualSystemPersistenceHook extends GraphPersistenceHook {
   deserializeNode(key: string, data: any | undefined): void {
     if (data === undefined) throw Error("not reachable");
 
-    let node = { x: data.x as number, y: data.y as number, color: data.color as string };
+    let node = {
+      x: data.x as number,
+      y: data.y as number,
+      color: data.color as string
+    };
 
     let entity = this.system.scene.nodes.get(key);
     if (entity !== undefined) {

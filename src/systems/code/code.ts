@@ -6,7 +6,9 @@ export class GraphCodeEditorSystem extends GraphSystem {
   public editor: CodeMirror.Editor = (window as any).editor;
 
   private _shouldReplayOnEvents = false;
-  private get shouldReplayOnEvents() { return this._shouldReplayOnEvents };
+  private get shouldReplayOnEvents() {
+    return this._shouldReplayOnEvents;
+  }
   private set shouldReplayOnEvents(value: boolean) {
     if (value == true) {
       document.getElementById("replayButton")!.style.color = "#909090";
@@ -23,10 +25,10 @@ export class GraphCodeEditorSystem extends GraphSystem {
 
     document.getElementById("replayButton")!.onclick = () => {
       this.shouldReplayOnEvents = !this.shouldReplayOnEvents;
-    }
+    };
   }
 
-  update() { }
+  update() {}
 
   onEvent(type: GraphEventType, key: string): void {
     if (this.shouldReplayOnEvents) {

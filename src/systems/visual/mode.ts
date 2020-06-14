@@ -1,5 +1,5 @@
-import { GraphVisualSystem } from './visual';
-import { EdgeEntity, NodeEntity } from './entity'
+import { GraphVisualSystem } from "./visual";
+import { EdgeEntity, NodeEntity } from "./entity";
 
 export interface Mode {
   begin(system: GraphVisualSystem): void;
@@ -14,17 +14,17 @@ export class NodeMode implements Mode {
 
   end(system: GraphVisualSystem) {
     let nodes = system.scene.nodes;
-    nodes.forEach((n) => n.events.off('click'));
-    system.stage.off('click');
+    nodes.forEach(n => n.events.off("click"));
+    system.stage.off("click");
   }
 
   private configureCreation(system: GraphVisualSystem) {
-    system.stage.on('click', () => {
-      console.log('handling event');
+    system.stage.on("click", () => {
+      console.log("handling event");
       let pointer = system.stage.getPointerPosition();
       if (pointer != null) {
         let node = new NodeEntity(pointer.x, pointer.y);
-        node.events.on('click', () => {
+        node.events.on("click", () => {
           system.scene.removeNode(node);
           system.scene.markNeedsDrawing();
         });
@@ -35,11 +35,13 @@ export class NodeMode implements Mode {
   }
 
   private configureDestruction(system: GraphVisualSystem) {
-    let nodes = system.scene.nodes
-    nodes.forEach((n) => n.events.on('click', () => {
-      system.scene.removeNode(n);
-      system.scene.markNeedsDrawing();
-    }));
+    let nodes = system.scene.nodes;
+    nodes.forEach(n =>
+      n.events.on("click", () => {
+        system.scene.removeNode(n);
+        system.scene.markNeedsDrawing();
+      })
+    );
   }
 }
 
@@ -51,40 +53,44 @@ export class EdgeMode implements Mode {
 
   end(system: GraphVisualSystem) {
     let nodes = system.scene.nodes;
-    nodes.forEach((n) => n.events.off('click'));
+    nodes.forEach(n => n.events.off("click"));
     let edges = system.scene.edges;
-    edges.forEach((e) => e.events.off('click'));
+    edges.forEach(e => e.events.off("click"));
   }
 
   create = (system: GraphVisualSystem) => {
     let from: NodeEntity | null = null;
     let to: NodeEntity | null = null;
     let nodes = system.scene.nodes;
-    nodes.forEach((n) => n.events.on('click', () => {
-      if (from == null) {
-        from = n;
-      } else if (to == null) {
-        to = n;
-      }
+    nodes.forEach(n =>
+      n.events.on("click", () => {
+        if (from == null) {
+          from = n;
+        } else if (to == null) {
+          to = n;
+        }
 
-      if (from != null && to != null) {
-        let edge = new EdgeEntity(from, to);
-        edge.events.on('click', () => {
-          system.scene.removeEdge(edge);
+        if (from != null && to != null) {
+          let edge = new EdgeEntity(from, to);
+          edge.events.on("click", () => {
+            system.scene.removeEdge(edge);
+            system.scene.markNeedsDrawing();
+          });
+          system.scene.addEdge(edge);
           system.scene.markNeedsDrawing();
-        });
-        system.scene.addEdge(edge);
-        system.scene.markNeedsDrawing();
-        from = to = null;
-      }
-    }));
-  }
+          from = to = null;
+        }
+      })
+    );
+  };
 
   destroy = (system: GraphVisualSystem) => {
     let edges = system.scene.edges;
-    edges.forEach((e) => e.events.on('click', () => {
-      system.scene.removeEdge(e);
-      system.scene.markNeedsDrawing();
-    }));
-  }
+    edges.forEach(e =>
+      e.events.on("click", () => {
+        system.scene.removeEdge(e);
+        system.scene.markNeedsDrawing();
+      })
+    );
+  };
 }

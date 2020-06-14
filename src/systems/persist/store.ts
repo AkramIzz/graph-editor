@@ -17,7 +17,7 @@ export abstract class Parser<DataType> {
 export class MemoryStore<DataType> implements Store<DataType> {
   private _stores = new Map<string, StoreData<DataType>>();
 
-  constructor(private parser: Parser<DataType>) { }
+  constructor(private parser: Parser<DataType>) {}
 
   async open(name: string): Promise<StoreData<DataType>> {
     let storeData = this._stores.get(name);
@@ -33,7 +33,7 @@ export class MemoryStore<DataType> implements Store<DataType> {
 export class MemoryStoreData<DataType> implements StoreData<DataType> {
   private data: Map<string, string> = new Map<string, string>();
 
-  constructor(private parser: Parser<DataType>) { }
+  constructor(private parser: Parser<DataType>) {}
 
   async put(key: string, value: DataType): Promise<boolean> {
     this.data.set(key, this.parser.stringify(value));
@@ -53,13 +53,13 @@ export class MemoryStoreData<DataType> implements StoreData<DataType> {
     }
   }
 
-  close(): void { }
+  close(): void {}
 }
 
 export class LocalStorageStore<DataType> implements Store<DataType> {
   private _stores = new Map<string, StoreData<DataType>>();
 
-  constructor(private parser: Parser<DataType>) { }
+  constructor(private parser: Parser<DataType>) {}
 
   async open(name: string): Promise<StoreData<DataType>> {
     let storeData = this._stores.get(name);

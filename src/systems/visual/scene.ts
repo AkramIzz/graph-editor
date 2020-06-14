@@ -1,7 +1,7 @@
-import konva from 'konva';
-import { GraphEventType } from '../../event';
-import { NodeEntity, EdgeEntity } from './entity';
-import { Graph } from '../../graph';
+import konva from "konva";
+import { GraphEventType } from "../../event";
+import { NodeEntity, EdgeEntity } from "./entity";
+import { Graph } from "../../graph";
 
 export class Scene {
   Node = NodeEntity;
@@ -14,13 +14,13 @@ export class Scene {
 
   private needsDrawing = false;
 
-  constructor(private graph: Graph) { }
+  constructor(private graph: Graph) {}
 
   markNeedsDrawing() {
     this.needsDrawing = true;
   }
 
-  init(): void { }
+  init(): void {}
 
   update() {
     if (this.needsDrawing) {
@@ -30,7 +30,7 @@ export class Scene {
   }
 
   addNode(entity: NodeEntity) {
-    let node = this.graph.addNode()
+    let node = this.graph.addNode();
 
     entity.key = node.key;
     this.nodes.set(node.key, entity);
@@ -41,7 +41,7 @@ export class Scene {
   removeNode(entity: NodeEntity) {
     if (entity.key == undefined) return;
 
-    this.graph.removeNode(this.graph.getNodeByKey(entity.key)!)
+    this.graph.removeNode(this.graph.getNodeByKey(entity.key)!);
     this.nodes.delete(entity.key);
 
     entity.key = undefined;
@@ -55,7 +55,7 @@ export class Scene {
     entity.key = edge.key;
     this.edges.set(edge.key, entity);
 
-    this._layer.add(entity._shape)
+    this._layer.add(entity._shape);
   }
 
   removeEdge(entity: EdgeEntity) {

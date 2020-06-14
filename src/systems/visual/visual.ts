@@ -1,14 +1,14 @@
-import konva from 'konva';
-import { GraphSystem } from '../system';
-import { Mode, NodeMode, EdgeMode } from './mode';
-import { Scene } from './scene';
-import { GraphEventType } from '../../event';
+import konva from "konva";
+import { GraphSystem } from "../system";
+import { Mode, NodeMode, EdgeMode } from "./mode";
+import { Scene } from "./scene";
+import { GraphEventType } from "../../event";
 
 export class GraphVisualSystem extends GraphSystem {
   stage = new konva.Stage({
-    container: 'stage',
+    container: "stage",
     width: window.innerWidth / 3,
-    height: window.innerHeight * 0.8,
+    height: window.innerHeight * 0.8
   });
 
   scene!: Scene;
@@ -28,9 +28,9 @@ export class GraphVisualSystem extends GraphSystem {
   }
 
   init() {
-    window.addEventListener('keypress', (ev) => {
-      if (ev.key == 'm') {
-        console.log('changing mode');
+    window.addEventListener("keypress", ev => {
+      if (ev.key == "m") {
+        console.log("changing mode");
         this.changeMode();
       }
     });
