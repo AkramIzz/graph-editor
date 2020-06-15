@@ -1,67 +1,67 @@
 <html>
+  <head>
+    <title>Graph Editor</title>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <style type="text/css" media="screen">
+      body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        background-color: #f0f0f0;
+      }
 
-<head>
-  <title>Graph Editor</title>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-  <style type="text/css" media="screen">
-    body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background-color: #f0f0f0;
-    }
+      #workspace {
+        margin: 0;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: space-around;
+        height: 90%;
+      }
 
-    #workspace {
-      margin: 0;
-      display: flex;
-      flex-flow: row wrap;
-      justify-content: space-around;
-      height: 90%;
-    }
+      #editor,
+      #stage,
+      #graph {
+        margin: 0;
+        width: 33%;
+        height: 100%;
+      }
 
-    #editor,
-    #stage,
-    #graph {
-      margin: 0;
-      width: 33%;
-      height: 100%;
-    }
+      #stage {
+        background-color: rgba(34, 36, 39, 0.2);
+      }
 
-    #stage {
-      background-color: rgba(34, 36, 39, .2);
-    }
+      #graph textarea {
+        resize: none;
+        height: 100%;
+        width: 100%;
+      }
+    </style>
+    <link rel="stylesheet" href="codemirror/lib/codemirror.css" />
+    <link rel="stylesheet" href="codemirror/addon/hint/show-hint.css" />
+  </head>
 
-    #graph textarea {
-      resize: none;
-      height: 100%;
-      width: 100%;
-    }
-  </style>
-  <link rel="stylesheet" href="codemirror/lib/codemirror.css">
-  <link rel="stylesheet" href="codemirror/addon/hint/show-hint.css">
-</head>
-
-<body style="height: 100%">
-  <p style="margin: 16px; text-align: center;">Graph Editor</p>
-  <button id="evalButton">Eval</button>
-  <button id="replayButton">Replay</button>
-  <div id="workspace">
-    <div id="editor"></div>
-    <div id="stage"></div>
-    <div id="graph">
-      <textarea name="graph" id="graph-text" resize="none"></textarea>
+  <body style="height: 100%;">
+    <p style="margin: 16px; text-align: center;">Graph Editor</p>
+    <button id="evalButton">Eval</button>
+    <button id="replayButton">Replay</button>
+    <div id="workspace">
+      <div id="editor"></div>
+      <div id="stage"></div>
+      <div id="graph">
+        <button id="saveButton">Save</button>
+        <button id="loadButton">Load</button>
+        <textarea name="graph" id="graph-text" resize="none"></textarea>
+      </div>
     </div>
-  </div>
 
-  <script src="codemirror/lib/codemirror.js"></script>
-  <script src="codemirror/addon/hint/show-hint.js"></script>
-  <script src="codemirror/addon/hint/javascript-hint.js"></script>
-  <script src="codemirror/mode/javascript/javascript.js"></script>
+    <script src="codemirror/lib/codemirror.js"></script>
+    <script src="codemirror/addon/hint/show-hint.js"></script>
+    <script src="codemirror/addon/hint/javascript-hint.js"></script>
+    <script src="codemirror/mode/javascript/javascript.js"></script>
 
-  <script src="editor_setup.js"></script>
+    <script src="editor_setup.js"></script>
 
-  <script src="build/bundle.js"></script>
-</body>
-
+    <script src="build/bundle.js"></script>
+  </body>
 </html>

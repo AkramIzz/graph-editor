@@ -1,24 +1,29 @@
-import konva from 'konva';
-import { GraphSystem } from "../system";
-import { GraphEventType } from '../../event';
-import { GraphEngine } from '../../engine';
-import { GraphVisualSystem } from './visual';
+import konva from "konva";
+import { GraphEventType } from "../../event";
+import { NodeEntity, EdgeEntity } from "./entity";
+import { Graph } from "../../graph";
 
-export class SceneManager extends GraphSystem {
+export class Scene {
+  Node = NodeEntity;
+  Edge = EdgeEntity;
+
   nodes = new Map<string, NodeEntity>();
   edges = new Map<string, EdgeEntity>();
-  nodes_keys = new Array<string>();
-  line_ends = new Array<string>();
 
   _layer = new konva.Layer();
 
+  nodes_keys = new Array<string>();
+  line_ends = new Array<string>();
+
   private needsDrawing = false;
+
+  constructor(private graph: Graph) {}
 
   markNeedsDrawing() {
     this.needsDrawing = true;
   }
 
-  init(): void { }
+  init(): void {}
 
   update() {
     if (this.needsDrawing) {
@@ -28,23 +33,25 @@ export class SceneManager extends GraphSystem {
   }
 
   addNode(entity: NodeEntity) {
-    let node = this.graph.addNode()
+    let node = this.graph.addNode();
 
     entity.key = node.key;
     this.nodes.set(node.key, entity);
 
     this._layer.add(entity._shape);
+
     this.updateConvexHulls();
   }
 
   removeNode(entity: NodeEntity) {
     if (entity.key == undefined) return;
 
-    this.graph.removeNode(this.graph.getNodeByKey(entity.key)!)
+    this.graph.removeNode(this.graph.getNodeByKey(entity.key)!);
     this.nodes.delete(entity.key);
 
     entity.key = undefined;
     entity._shape.remove();
+
     this.updateConvexHulls();
   }
 
@@ -55,7 +62,7 @@ export class SceneManager extends GraphSystem {
     entity.key = edge.key;
     this.edges.set(edge.key, entity);
 
-    this._layer.add(entity._shape)
+    this._layer.add(entity._shape);
   }
 
   removeEdge(entity: EdgeEntity) {
@@ -95,6 +102,7 @@ export class SceneManager extends GraphSystem {
         let secondNode = this.nodes.get(edge.secondNode.key)!;
 
         let edgeEntity = new EdgeEntity(firstNode, secondNode);
+        edgeEntity.key = key;
         this.edges.set(key, edgeEntity);
         this._layer.add(edgeEntity._shape);
 
@@ -260,86 +268,4 @@ export class SceneManager extends GraphSystem {
     this.allConvexHulls();
     this.drawConvexHulls();
   };
-}
-
-abstract class Entity {
-  key: string | undefined;
-
-  public get graphic(): konva.Shape { return this._shape.children[0] as konva.Shape; }
-  public set graphic(shape: konva.Shape) {
-    this._shape.removeChildren();
-    this._shape.add(shape);
-  }
-
-  public _shape: konva.Group;
-
-  constructor(graphic: konva.Shape) {
-    this._shape = new konva.Group();
-    this._shape.add(graphic);
-  }
-
-  public get position() { return this.graphic.position() };
-  public get events() {
-    return { on: this._shape.on.bind(this._shape), off: this._shape.off.bind(this._shape) };
-  }
-}
-
-export class NodeEntity extends Entity {
-  constructor(x: number, y: number) {
-    super(NodeEntity.createNode(x, y));
-
-    let system = GraphEngine.instance.systems.get(GraphVisualSystem.name)! as GraphVisualSystem
-    this.events.on('dragmove', () => {
-      if (this.key === undefined) return;
-      let edges = system.graph.getEdgesOfNode(system.graph.getNodeByKey(this.key)!)
-      edges.forEach((edge) => {
-        let edgeEntity = system.edges.get(edge.key)!
-
-        edgeEntity.graphic = EdgeEntity.createEdge(
-          system.nodes.get(edge.firstNode.key)!,
-          system.nodes.get(edge.secondNode.key)!
-        );
-
-        system.markNeedsDrawing();
-      });
-    });
-
-    this.events.on("dragend", () => {
-      system.updateConvexHulls();
-      system.markNeedsDrawing();
-    });
-  }
-
-  static createNode(x: number, y: number): konva.Circle {
-    let node = new konva.Circle({
-      x: x, y: y,
-      radius: 10,
-      fill: 'white',
-      stroke: 'black',
-      strokeWidth: 2,
-      draggable: true,
-    });
-
-    return node;
-  }
-}
-
-export class EdgeEntity extends Entity {
-  constructor(public from: NodeEntity, public to: NodeEntity) {
-    super(EdgeEntity.createEdge(from, to));
-  }
-
-  static createEdge(from: NodeEntity, to: NodeEntity): konva.Line {
-    let edge = new konva.Line({
-      fill: 'white',
-      stroke: 'black',
-      strokeWidth: 2,
-      points: [
-        from.position.x, from.position.y,
-        to.position.x, to.position.y,
-      ],
-    });
-
-    return edge;
-  }
 }

@@ -1,22 +1,47 @@
-import { GraphEventType, GraphEventSource, GraphEventListener, GraphEventsStream } from '../event';
-import { Graph, GraphNode, GraphEdge } from '../graph';
-import { GraphEngine } from '../engine';
+import {
+  GraphEventType,
+  GraphEventSource,
+  GraphEventListener,
+  GraphEventsStream
+} from "../event";
+import { Graph, GraphNode, GraphEdge } from "../graph";
+import { GraphEngine } from "../engine";
 
 export abstract class GraphSystem {
-  readonly graph: GraphEventsSharedDispatchListener
+  graph: GraphEventsSharedDispatchListener;
 
-  constructor(
-    public readonly engine: GraphEngine,
-    _graph: GraphEventsStream,
-  ) {
+  constructor(public readonly engine: GraphEngine, _graph: GraphEventsStream) {
     this.graph = new GraphEventsSharedDispatchListener(this, _graph);
   }
 
   abstract init(): void;
 
+  start(): void {}
+
+  stop(): void {}
+
   abstract update(): void;
 
   abstract onEvent(type: GraphEventType, key: string): void;
+
+  restart(graph: GraphEventsStream) {
+    this.stop();
+    this.graph = new GraphEventsSharedDispatchListener(this, graph);
+    this.start();
+  }
+}
+
+export abstract class GraphSystemWithHooks<HookType> extends GraphSystem {
+  readonly hooks: Array<HookType>;
+
+  constructor(engine: GraphEngine, graph: GraphEventsStream) {
+    super(engine, graph);
+    this.hooks = [];
+  }
+
+  registerHook(hook: HookType) {
+    this.hooks.push(hook);
+  }
 }
 
 class GraphEventsSharedDispatchListener implements Graph {
@@ -29,7 +54,11 @@ class GraphEventsSharedDispatchListener implements Graph {
     source.addListener(this.onEvent.bind(this));
   }
 
-  private onEvent(type: GraphEventType, key: string, emitter: GraphEventSource): void {
+  private onEvent(
+    type: GraphEventType,
+    key: string,
+    emitter: GraphEventSource
+  ): void {
     if (emitter !== this) {
       this.sink.onEvent(type, key);
     }
@@ -39,7 +68,11 @@ class GraphEventsSharedDispatchListener implements Graph {
     return this.source.addNode(value, this);
   }
 
-  addEdge(_firstNode: GraphNode, _secondNode: GraphNode, value?: any): GraphEdge {
+  addEdge(
+    _firstNode: GraphNode,
+    _secondNode: GraphNode,
+    value?: any
+  ): GraphEdge {
     return this.source.addEdge(_firstNode, _secondNode, value, this);
   }
 
@@ -63,15 +96,18 @@ class GraphEventsSharedDispatchListener implements Graph {
     return this.source.getEdgeByKey(key);
   }
 
-  getEdgeByNodes(firstNode: GraphNode, secondNode: GraphNode): GraphEdge | undefined {
+  getEdgeByNodes(
+    firstNode: GraphNode,
+    secondNode: GraphNode
+  ): GraphEdge | undefined {
     return this.source.getEdgeByNodes(firstNode, secondNode);
   }
 
   getNodesOfEdge(_edge: GraphEdge): [GraphNode, GraphNode] {
-    return this.source.getNodesOfEdge(_edge)
+    return this.source.getNodesOfEdge(_edge);
   }
 
   getEdgesOfNode(_node: GraphNode): Set<GraphEdge> {
-    return this.source.getEdgesOfNode(_node)
+    return this.source.getEdgesOfNode(_node);
   }
 }
