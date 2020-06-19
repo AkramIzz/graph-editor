@@ -13,8 +13,7 @@ export class Scene {
 
   _layer = new konva.Layer();
 
-  nodes_keys = new Array<NodeEntity>();
-  line_ends = new Array<NodeEntity>();
+  convexHulls = new GraphConvexHulls(this.nodes);
 
   private needsDrawing = false;
 
@@ -123,12 +122,15 @@ export class Scene {
     this.markNeedsDrawing();
   }
 
-  removeConvexHulls = () => {
-    if (this.nodes_keys.length <= 1) return;
+  removeConvexHulls = (
+    nodes_keys: Array<NodeEntity>,
+    line_ends: Array<NodeEntity>
+  ) => {
+    if (nodes_keys.length <= 1) return;
 
-    for (let i = 0; i < this.nodes_keys.length; ++i) {
-      let fNode = this.graph.getNodeByKey(this.nodes_keys[i].key!);
-      let lNode = this.graph.getNodeByKey(this.line_ends[i].key!);
+    for (let i = 0; i < nodes_keys.length; ++i) {
+      let fNode = this.graph.getNodeByKey(nodes_keys[i].key!);
+      let lNode = this.graph.getNodeByKey(line_ends[i].key!);
       if (fNode !== undefined && lNode !== undefined) {
         let edge = this.graph.getEdgeByNodes(fNode, lNode);
         if (edge === undefined) continue;
@@ -139,16 +141,19 @@ export class Scene {
     }
   };
 
-  drawConvexHulls = () => {
-    if (this.nodes_keys.length <= 1) return;
+  drawConvexHulls = (
+    nodes_keys: Array<NodeEntity>,
+    line_ends: Array<NodeEntity>
+  ) => {
+    if (nodes_keys.length <= 1) return;
 
-    for (let i = 0; i < this.nodes_keys.length; ++i) {
-      let fNode = this.graph.getNodeByKey(this.nodes_keys[i].key!)!;
-      let lNode = this.graph.getNodeByKey(this.line_ends[i].key!)!;
+    for (let i = 0; i < nodes_keys.length; ++i) {
+      let fNode = this.graph.getNodeByKey(nodes_keys[i].key!)!;
+      let lNode = this.graph.getNodeByKey(line_ends[i].key!)!;
 
       if (this.graph.getEdgeByNodes(fNode, lNode) === undefined) {
-        let fNodeEntity = this.nodes_keys[i];
-        let lNodeEntity = this.line_ends[i];
+        let fNodeEntity = nodes_keys[i];
+        let lNodeEntity = line_ends[i];
         let edgeEntity = new EdgeEntity(fNodeEntity, lNodeEntity);
         this.addEdge(edgeEntity);
       }
@@ -156,8 +161,10 @@ export class Scene {
   };
 
   updateConvexHulls = () => {
-    this.removeConvexHulls();
-    [this.nodes_keys, this.line_ends] = new GraphConvexHulls(this.nodes).get();
-    this.drawConvexHulls();
+    let [nodes_keys, line_ends] = this.convexHulls.get();
+    this.removeConvexHulls(nodes_keys, line_ends);
+    this.convexHulls = new GraphConvexHulls(this.nodes);
+    [nodes_keys, line_ends] = this.convexHulls.get();
+    this.drawConvexHulls(nodes_keys, line_ends);
   };
 }
