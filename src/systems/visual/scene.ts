@@ -123,44 +123,41 @@ export class Scene {
     this.markNeedsDrawing();
   }
 
-  allConvexHulls() {
-    [this.nodes_keys, this.line_ends] = new GraphConvexHulls(this.nodes).get();
-  }
-
   removeConvexHulls = () => {
-    if (this.nodes_keys.length > 1) {
-      for (let i = 0; i < this.nodes_keys.length; i++) {
-        let f_node = this.graph.getNodeByKey(this.nodes_keys[i]);
-        let l_node = this.graph.getNodeByKey(this.line_ends[i]);
-        if (f_node != undefined && l_node != undefined) {
-          if (this.graph.getEdgeByNodes(f_node!, l_node!)) {
-            let e_key = this.graph.getEdgeByNodes(f_node!, l_node!)!.key;
-            let e = this.edges.get(e_key);
-            this.removeEdge(e!);
-          }
-        }
+    if (this.nodes_keys.length <= 1) return;
+
+    for (let i = 0; i < this.nodes_keys.length; ++i) {
+      let fNode = this.graph.getNodeByKey(this.nodes_keys[i]);
+      let lNode = this.graph.getNodeByKey(this.line_ends[i]);
+      if (fNode !== undefined && lNode !== undefined) {
+        let edge = this.graph.getEdgeByNodes(fNode, lNode);
+        if (edge === undefined) continue;
+
+        let entity = this.edges.get(edge.key)!;
+        this.removeEdge(entity);
       }
     }
   };
 
   drawConvexHulls = () => {
-    if (this.nodes_keys.length > 1) {
-      for (let i = 0; i < this.nodes_keys.length; i++) {
-        let f = this.nodes.get(this.nodes_keys[i])!;
-        let l = this.nodes.get(this.line_ends[i])!;
-        let e = new EdgeEntity(f, l);
-        let f_node = this.graph.getNodeByKey(this.nodes_keys[i]);
-        let l_node = this.graph.getNodeByKey(this.line_ends[i]);
-        if (!this.graph.getEdgeByNodes(f_node!, l_node!)) {
-          this.addEdge(e);
-        }
+    if (this.nodes_keys.length <= 1) return;
+
+    for (let i = 0; i < this.nodes_keys.length; ++i) {
+      let fNode = this.graph.getNodeByKey(this.nodes_keys[i])!;
+      let lNode = this.graph.getNodeByKey(this.line_ends[i])!;
+
+      if (this.graph.getEdgeByNodes(fNode, lNode) === undefined) {
+        let fNodeEntity = this.nodes.get(this.nodes_keys[i])!;
+        let lNodeEntity = this.nodes.get(this.line_ends[i])!;
+        let edgeEntity = new EdgeEntity(fNodeEntity, lNodeEntity);
+        this.addEdge(edgeEntity);
       }
     }
   };
 
   updateConvexHulls = () => {
     this.removeConvexHulls();
-    this.allConvexHulls();
+    [this.nodes_keys, this.line_ends] = new GraphConvexHulls(this.nodes).get();
     this.drawConvexHulls();
   };
 }
