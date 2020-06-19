@@ -29,6 +29,7 @@ export interface GraphEventSource {
 
 export class GraphEventsStream extends Graph implements GraphEventSource {
   private listeners = new Set<GraphEventListener>();
+  private afterListeners = new Set<GraphEventListener>();
 
   private pushEvent(
     type: GraphEventType,
@@ -36,13 +37,22 @@ export class GraphEventsStream extends Graph implements GraphEventSource {
     emitter: GraphEventSource
   ) {
     console.log(`pushing event: ${type}, key: ${key}, emitter: ${emitter}`);
+
     this.listeners.forEach(listener => {
+      listener(type, key, emitter);
+    });
+
+    this.afterListeners.forEach(listener => {
       listener(type, key, emitter);
     });
   }
 
   addListener(listener: GraphEventListener) {
     this.listeners.add(listener);
+  }
+
+  addAfterListener(listener: GraphEventListener) {
+    this.afterListeners.add(listener);
   }
 
   addNode(value?: any, emitter?: GraphEventSource) {
