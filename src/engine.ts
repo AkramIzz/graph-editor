@@ -1,6 +1,7 @@
 import { GraphEventsStream } from "./event";
 import { GraphSystem } from "./systems/system";
 import { GraphVisualSystem } from "./systems/visual/visual";
+import { GraphConvexHulls } from "./systems/visual/convex_hull";
 import { GraphCodeEditorSystem } from "./systems/code/code";
 import { GraphHistorySystem } from "./systems/history/history";
 import {
@@ -30,6 +31,10 @@ export class GraphEngine {
     this.systems.set(
       GraphVisualSystem.name,
       new GraphVisualSystem(this, this.graph)
+    );
+    this.systems.set(
+      GraphConvexHulls.name,
+      new GraphConvexHulls(this, this.graph)
     );
     this.systems.set(
       GraphCodeEditorSystem.name,

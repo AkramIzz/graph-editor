@@ -1,18 +1,104 @@
 import { NodeEntity } from "../visual/entity";
+import { GraphSystem } from "../system";
+import { GraphEngine } from "../../engine";
+import { GraphEventsStream, GraphEventType } from "../../event";
+import { GraphVisualSystem } from "./visual";
 
-export class GraphConvexHulls {
-  private _ran = false;
+export class GraphConvexHulls extends GraphSystem {
   private nodes_keys: Array<NodeEntity>;
   private line_ends: Array<NodeEntity>;
+  private visualSystem!: GraphVisualSystem;
+  private nodes!: Map<string, NodeEntity>;
 
-  constructor(private nodes: Map<string, NodeEntity>) {
-    if (this.nodes.size == 0) {
-      this.nodes_keys = [];
-      this.line_ends = [];
-    } else {
-      this.nodes_keys = Array.from(this.nodes.values());
-      this.nodes_keys.sort(this.comparePoints);
-      this.line_ends = Object.assign([], this.nodes_keys);
+  constructor(engine: GraphEngine, graph: GraphEventsStream) {
+    super(engine, graph);
+    this.nodes_keys = [];
+    this.line_ends = [];
+  }
+
+  init(): void {}
+
+  start(): void {
+    this.visualSystem = this.engine.systems.get(
+      GraphVisualSystem.name
+    ) as GraphVisualSystem;
+
+    this.nodes = this.visualSystem.scene.nodes;
+  }
+
+  update(): void {}
+
+  onEvent(type: GraphEventType, key: string): void {}
+
+  onAfterEvent(type: GraphEventType, key: string): void {
+    switch (type) {
+      case GraphEventType.nodeAdded:
+        // THE USE of setTimeout IS A HACK.
+        // we need to make sure that the added node is registered in the visual system.
+        // without the timeout, this will work if the emitter is not the visual system.
+        // when the emitter is the visual system, VisualSystem.onEvent is not called
+        // and the visual system waits till all of onEvent/onAfterEvent are executed to be able
+        // to register the node.
+        // Suggestion: add a one time event listener that should be used instead of sequential logic.
+        // this.graph.addNode(onEvent=(key) {
+        //   // register key
+        // });
+        // or make it a promise.
+        setTimeout(() => {
+          this.visualSystem.scene.nodes.get(key)!.events.on("dragend", () => {
+            this.updateConvexHulls();
+            this.visualSystem.scene.markNeedsDrawing();
+          });
+          this.updateConvexHulls();
+        }, 0);
+        break;
+      case GraphEventType.nodeRemoved:
+        setTimeout(() => {
+          this.updateConvexHulls();
+        });
+        break;
+    }
+  }
+
+  updateConvexHulls() {
+    this.removeConvexHulls(this.nodes_keys, this.line_ends);
+
+    this.nodes_keys = Array.from(this.nodes.values());
+    this.nodes_keys.sort(this.comparePoints);
+    this.line_ends = Object.assign([], this.nodes_keys);
+
+    this.run();
+
+    this.drawConvexHulls(this.nodes_keys, this.line_ends);
+  }
+
+  removeConvexHulls(
+    nodes_keys: Array<NodeEntity>,
+    line_ends: Array<NodeEntity>
+  ) {
+    if (nodes_keys.length <= 1) return;
+
+    for (let i = 0; i < nodes_keys.length; ++i) {
+      let fNode = this.graph.getNodeByKey(nodes_keys[i].key!);
+      let lNode = this.graph.getNodeByKey(line_ends[i].key!);
+      if (fNode !== undefined && lNode !== undefined) {
+        let edge = this.graph.getEdgeByNodes(fNode, lNode);
+        if (edge === undefined) continue;
+        this.graph.removeEdge(edge);
+      }
+    }
+  }
+
+  drawConvexHulls(nodes_keys: Array<NodeEntity>, line_ends: Array<NodeEntity>) {
+    if (nodes_keys.length <= 1) return;
+
+    for (let i = 0; i < nodes_keys.length; ++i) {
+      let fNode = this.graph.getNodeByKey(nodes_keys[i].key!)!;
+      let lNode = this.graph.getNodeByKey(line_ends[i].key!)!;
+
+      if (this.graph.getEdgeByNodes(fNode, lNode) === undefined) {
+        this.graph.addEdge(fNode, lNode);
+      }
     }
   }
 
@@ -22,15 +108,6 @@ export class GraphConvexHulls {
         this.convexHull(i);
       }
     }
-  }
-
-  get() {
-    if (!this._ran) {
-      this.run();
-      this._ran = true;
-    }
-
-    return [this.nodes_keys, this.line_ends];
   }
 
   convexHull(pos: number = 0) {

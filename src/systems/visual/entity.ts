@@ -76,11 +76,6 @@ export class NodeEntity extends Entity {
         system.scene.markNeedsDrawing();
       });
     });
-
-    this.events.on("dragend", () => {
-      system.scene.updateConvexHulls();
-      system.scene.markNeedsDrawing();
-    });
   }
 
   static createNode(x: number, y: number, color: string): konva.Circle {
