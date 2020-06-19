@@ -1,7 +1,7 @@
 import { GraphEventsStream } from "./event";
 import { GraphSystem } from "./systems/system";
 import { GraphVisualSystem } from "./systems/visual/visual";
-import { GraphConvexHulls } from "./systems/visual/convex_hull";
+import { GraphConvexHulls } from "./systems/convex_hull/convex_hull";
 import { GraphCodeEditorSystem } from "./systems/code/code";
 import { GraphHistorySystem } from "./systems/history/history";
 import {

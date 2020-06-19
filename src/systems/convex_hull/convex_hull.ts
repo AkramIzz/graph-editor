@@ -2,7 +2,7 @@ import { NodeEntity } from "../visual/entity";
 import { GraphSystem } from "../system";
 import { GraphEngine } from "../../engine";
 import { GraphEventsStream, GraphEventType } from "../../event";
-import { GraphVisualSystem } from "./visual";
+import { GraphVisualSystem } from "../visual/visual";
 
 export class GraphConvexHulls extends GraphSystem {
   private nodes_keys: Array<NodeEntity>;
