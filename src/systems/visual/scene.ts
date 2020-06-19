@@ -13,8 +13,8 @@ export class Scene {
 
   _layer = new konva.Layer();
 
-  nodes_keys = new Array<string>();
-  line_ends = new Array<string>();
+  nodes_keys = new Array<NodeEntity>();
+  line_ends = new Array<NodeEntity>();
 
   private needsDrawing = false;
 
@@ -127,8 +127,8 @@ export class Scene {
     if (this.nodes_keys.length <= 1) return;
 
     for (let i = 0; i < this.nodes_keys.length; ++i) {
-      let fNode = this.graph.getNodeByKey(this.nodes_keys[i]);
-      let lNode = this.graph.getNodeByKey(this.line_ends[i]);
+      let fNode = this.graph.getNodeByKey(this.nodes_keys[i].key!);
+      let lNode = this.graph.getNodeByKey(this.line_ends[i].key!);
       if (fNode !== undefined && lNode !== undefined) {
         let edge = this.graph.getEdgeByNodes(fNode, lNode);
         if (edge === undefined) continue;
@@ -143,12 +143,12 @@ export class Scene {
     if (this.nodes_keys.length <= 1) return;
 
     for (let i = 0; i < this.nodes_keys.length; ++i) {
-      let fNode = this.graph.getNodeByKey(this.nodes_keys[i])!;
-      let lNode = this.graph.getNodeByKey(this.line_ends[i])!;
+      let fNode = this.graph.getNodeByKey(this.nodes_keys[i].key!)!;
+      let lNode = this.graph.getNodeByKey(this.line_ends[i].key!)!;
 
       if (this.graph.getEdgeByNodes(fNode, lNode) === undefined) {
-        let fNodeEntity = this.nodes.get(this.nodes_keys[i])!;
-        let lNodeEntity = this.nodes.get(this.line_ends[i])!;
+        let fNodeEntity = this.nodes_keys[i];
+        let lNodeEntity = this.line_ends[i];
         let edgeEntity = new EdgeEntity(fNodeEntity, lNodeEntity);
         this.addEdge(edgeEntity);
       }

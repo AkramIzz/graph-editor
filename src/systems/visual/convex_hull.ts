@@ -1,16 +1,16 @@
-import { NodeEntity } from './entity';
+import { NodeEntity } from "../visual/entity";
 
 export class GraphConvexHulls {
   private _ran = false;
-  private nodes_keys: Array<string>;
-  private line_ends: Array<string>;
+  private nodes_keys: Array<NodeEntity>;
+  private line_ends: Array<NodeEntity>;
 
   constructor(private nodes: Map<string, NodeEntity>) {
     if (this.nodes.size == 0) {
       this.nodes_keys = [];
       this.line_ends = [];
     } else {
-      this.nodes_keys = Array.from(this.nodes.keys());
+      this.nodes_keys = Array.from(this.nodes.values());
       this.nodes_keys.sort(this.comparePoints);
       this.line_ends = Object.assign([], this.nodes_keys);
     }
@@ -34,7 +34,7 @@ export class GraphConvexHulls {
   }
 
   convexHull(pos: number = 0) {
-    let start = this.nodes.get(this.nodes_keys[pos])!.position;
+    let start = this.nodes_keys[pos].position;
     let current = start;
     let current_id = pos;
     let collinear = Array<number>();
@@ -87,15 +87,15 @@ export class GraphConvexHulls {
   }
 
   getNodePosition = (index: number) => {
-    return this.nodes.get(this.nodes_keys[index])!.position;
+    return this.nodes_keys[index].position;
   };
 
-  comparePoints = (a: string, b: string) => {
-    let x1 = this.nodes.get(a)!.position.x;
-    let y1 = this.nodes.get(a)!.position.y;
+  comparePoints = (a: NodeEntity, b: NodeEntity) => {
+    let x1 = a.position.x;
+    let y1 = a.position.y;
 
-    let x2 = this.nodes.get(b)!.position.x;
-    let y2 = this.nodes.get(b)!.position.y;
+    let x2 = b.position.x;
+    let y2 = b.position.y;
 
     if (x1 > x2 || (x1 == x2 && y1 > y2)) {
       return 1;
