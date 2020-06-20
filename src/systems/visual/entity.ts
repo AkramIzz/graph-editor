@@ -36,7 +36,22 @@ abstract class Entity {
 }
 
 export class NodeEntity extends Entity {
+  private _nodeGraphic: konva.Shape;
+
   private _color: string;
+
+  private _key: string | undefined;
+  get key(): string | undefined {
+    return this._key;
+  }
+  set key(value: string | undefined) {
+    this._key = value;
+    let system = GraphEngine.instance.systems.get(
+      GraphVisualSystem.name
+    )! as GraphVisualSystem;
+    [this.graphic, this._nodeGraphic] = NodeEntity.createNode(this.position.x, this.position.y, this.color, value);
+    system.scene.markNeedsDrawing();
+  }
 
   get color(): string {
     return this._color;
@@ -47,14 +62,16 @@ export class NodeEntity extends Entity {
     let system = GraphEngine.instance.systems.get(
       GraphVisualSystem.name
     )! as GraphVisualSystem;
-    this.graphic.fill(color);
+    this._nodeGraphic.fill(color);
     system.scene.markNeedsDrawing();
 
     this._color = color;
   }
 
   constructor(x: number, y: number, color: string = "white") {
-    super(NodeEntity.createNode(x, y, color));
+    let [graphic, nodeGraphic] = NodeEntity.createNode(x, y, color);
+    super(graphic);
+    this._nodeGraphic = nodeGraphic;
     this._color = color;
 
     let system = GraphEngine.instance.systems.get(
@@ -79,18 +96,36 @@ export class NodeEntity extends Entity {
     });
   }
 
-  static createNode(x: number, y: number, color: string): konva.Circle {
-    let node = new konva.Circle({
+  static createNode(
+    x: number,
+    y: number,
+    color: string,
+    key?: string
+  ): [konva.Group, konva.Shape] {
+    let group = new konva.Group({
       x: x,
       y: y,
+      draggable: true
+    });
+
+    let node = new konva.Circle({
+      x: 0,
+      y: 0,
       radius: 10,
       fill: color,
       stroke: "black",
       strokeWidth: 2,
-      draggable: true
+      draggable: key === undefined,
     });
 
-    return node;
+    group.add(node);
+
+    if (key !== undefined) {
+      let text = new konva.Text({ text: key, x: 10, y: -10 });
+      group.add(text);
+    }
+
+    return [group, node];
   }
 }
 
