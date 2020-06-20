@@ -114,7 +114,6 @@ export class NodeEntity extends Entity {
       fill: color,
       stroke: "black",
       strokeWidth: 2,
-      draggable: key === undefined,
     });
 
     group.add(node);
