@@ -7,8 +7,8 @@ import { GraphEventType } from "../../event";
 export class GraphVisualSystem extends GraphSystem {
   stage = new konva.Stage({
     container: "stage",
-    width: window.innerWidth / 3,
-    height: window.innerHeight * 0.8
+    width: document.getElementById("stage")?.getBoundingClientRect().width,
+    height: document.getElementById("stage")?.getBoundingClientRect().height
   });
 
   scene!: Scene;
