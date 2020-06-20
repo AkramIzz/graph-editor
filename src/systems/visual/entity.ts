@@ -5,17 +5,17 @@ import { GraphVisualSystem } from "./visual";
 abstract class Entity {
   key: string | undefined;
 
-  public get graphic(): konva.Shape {
+  public get graphic(): konva.Group | konva.Shape {
     return this._shape.children[0] as konva.Shape;
   }
-  public set graphic(shape: konva.Shape) {
+  public set graphic(shape: konva.Group | konva.Shape) {
     this._shape.removeChildren();
     this._shape.add(shape);
   }
 
   public _shape: konva.Group;
 
-  constructor(graphic: konva.Shape) {
+  constructor(graphic: konva.Group | konva.Shape) {
     this._shape = new konva.Group();
     this._shape.add(graphic);
   }
@@ -43,6 +43,7 @@ export class NodeEntity extends Entity {
   }
 
   set color(color: string) {
+    this.graphic = this.graphic as konva.Circle;
     let system = GraphEngine.instance.systems.get(
       GraphVisualSystem.name
     )! as GraphVisualSystem;
@@ -101,6 +102,7 @@ export class EdgeEntity extends Entity {
   }
 
   set color(color: string) {
+    this.graphic = this.graphic as konva.Line;
     let system = GraphEngine.instance.systems.get(
       GraphVisualSystem.name
     )! as GraphVisualSystem;
