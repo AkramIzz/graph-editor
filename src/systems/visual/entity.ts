@@ -58,7 +58,6 @@ export class NodeEntity extends Entity {
   }
 
   set color(color: string) {
-    this.graphic = this.graphic as konva.Circle;
     let system = GraphEngine.instance.systems.get(
       GraphVisualSystem.name
     )! as GraphVisualSystem;
