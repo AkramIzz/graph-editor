@@ -24,6 +24,8 @@ export abstract class GraphSystem {
 
   abstract onEvent(type: GraphEventType, key: string): void;
 
+  onAfterEvent(type: GraphEventType, key: string): void {}
+
   restart(graph: GraphEventsStream) {
     this.stop();
     this.graph = new GraphEventsSharedDispatchListener(this, graph);
@@ -52,6 +54,7 @@ class GraphEventsSharedDispatchListener implements Graph {
     this.nodes = source.nodes;
     this.edges = source.edges;
     source.addListener(this.onEvent.bind(this));
+    source.addAfterListener(this.onAfterEvent.bind(this));
   }
 
   private onEvent(
@@ -61,6 +64,16 @@ class GraphEventsSharedDispatchListener implements Graph {
   ): void {
     if (emitter !== this) {
       this.sink.onEvent(type, key);
+    }
+  }
+
+  private onAfterEvent(
+    type: GraphEventType,
+    key: string,
+    emitter: GraphEventSource
+  ): void {
+    if (emitter !== this) {
+      this.sink.onAfterEvent(type, key);
     }
   }
 
@@ -86,6 +99,10 @@ class GraphEventsSharedDispatchListener implements Graph {
 
   addListener(listener: GraphEventListener): void {
     this.source.addListener(listener);
+  }
+
+  addAfterListener(listener: GraphEventListener): void {
+    this.source.addAfterListener(listener);
   }
 
   getNodeByKey(key: string): GraphNode | undefined {
