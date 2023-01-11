@@ -16,7 +16,7 @@
     "prettier": "2.0.5",
     "tsify": "^4.0.1",
     "typescript": "^3.8.3",
-    "watchify": "^3.11.1"
+    "watchify": "^4.0.0"
   },
   "dependencies": {
     "@types/ace": "0.0.43",
